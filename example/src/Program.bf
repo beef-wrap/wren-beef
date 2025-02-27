@@ -29,6 +29,18 @@ static class Program
 		}
 	}
 
+	static WrenForeignMethodFn fn = (vm) =>
+		{
+			let name = wrenGetSlotString(vm, 1);
+
+			Debug.WriteLine($"hello, {StringView(name)}!!");
+		};
+
+	static WrenForeignMethodFn WrenBindForeignMethodFn(WrenVM* vm, char8* module, char8* className, bool isStatic, char8* signature)
+	{
+		return fn;
+	}
+
 	static int Main(params String[] args)
 	{
 		WrenConfiguration config;
@@ -36,11 +48,21 @@ static class Program
 		wrenInitConfiguration(&config);
 		config.writeFn = => writeFn;
 		config.errorFn = => errorFn;
+		config.bindForeignMethodFn = => WrenBindForeignMethodFn;
 
 		WrenVM* vm = wrenNewVM(&config);
 
+		wrenEnsureSlots(vm, 4);
+
 		char8* module = "main";
-		char8* script = "System.print(\"I am running in a VM!\")";
+
+		char8* script = """
+			class Engine {
+			  foreign static hello(str)
+			}
+		
+			Engine.hello("I am running in a VM!")
+		""";
 
 		WrenInterpretResult result = wrenInterpret(vm, module, script);
 
