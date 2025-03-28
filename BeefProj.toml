@@ -2,9 +2,10 @@ FileVersion = 1
 
 [Project]
 Name = "wren-beef"
-TargetType = "BeefLib"
-StartupObject = "wren_beef.Program"
+DefaultNamespace = "wren"
 
 [Configs.Debug.Win64]
-CLibType = "DynamicDebug"
-LibPaths = ["$(ProjectDir)\\libs\\wren_d.lib"]
+LibPaths = ["$(ProjectDir)\\libs\\windows\\x64\\wren_d.lib"]
+
+[Configs.Release.Win64]
+LibPaths = ["$(ProjectDir)\\libs\\windows\\x64\\wren.lib"]

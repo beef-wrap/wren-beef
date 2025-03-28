@@ -2,7 +2,8 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
-using static wren_Beef.wren;
+
+using static wren.wren;
 
 namespace example;
 
@@ -13,7 +14,7 @@ static class Program
 		Debug.WriteLine(StringView(text));
 	}
 
-	static void errorFn(WrenVM* vm, WrenErrorType errorType, char8* module, int line, char8* msg)
+	static void errorFn(WrenVM* vm, WrenErrorType errorType, char8* module, int32 line, char8* msg)
 	{
 		switch (errorType)
 		{

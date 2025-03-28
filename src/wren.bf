@@ -24,7 +24,7 @@ SOFTWARE.*/
 using System;
 using System.Interop;
 
-namespace wren_Beef;
+namespace wren;
 
 public static class wren
 {
@@ -32,9 +32,9 @@ public static class wren
 	typealias char = c_char;
 
 	// The Wren semantic version number components.
-	const int WREN_VERSION_MAJOR = 0;
-	const int WREN_VERSION_MINOR = 4;
-	const int WREN_VERSION_PATCH = 0;
+	const c_int WREN_VERSION_MAJOR = 0;
+	const c_int WREN_VERSION_MINOR = 4;
+	const c_int WREN_VERSION_PATCH = 0;
 
 	// A human-friendly string representation of the version.
 	const String WREN_VERSION_STRING = "0.4.0";
@@ -109,8 +109,7 @@ public static class wren
 	// Displays a string of text to the user.
 	public function void WrenWriteFn(WrenVM* vm, char* text);
 
-	[CRepr]
-	public enum WrenErrorType
+	public enum WrenErrorType : c_int
 	{
 	  // A syntax or resolution error detected at compile time.
 		WREN_ERROR_COMPILE,
@@ -134,7 +133,7 @@ public static class wren
 	// made for each line in the stack trace. Each of those has the resolved
 	// [module] and [line] where the method or function is defined and [message] is
 	// the name of the method or function.
-	public function void WrenErrorFn(WrenVM* vm, WrenErrorType type, char* module, int line, char* message);
+	public function void WrenErrorFn(WrenVM* vm, WrenErrorType type, char* module, c_int line, char* message);
 
 	[CRepr]
 	public struct WrenForeignClassMethods
@@ -271,26 +270,24 @@ public static class wren
 		// frequent garbage collections.
 		//
 		// If zero, defaults to 50.
-		public int heapGrowthPercent;
+		public c_int heapGrowthPercent;
 
 		  // User-defined data associated with the VM.
 		public void* userData;
-	};
+	}
 
-	[CRepr]
-	public enum WrenInterpretResult
+	public enum WrenInterpretResult : c_int
 	{
 		WREN_RESULT_SUCCESS,
 		WREN_RESULT_COMPILE_ERROR,
 		WREN_RESULT_RUNTIME_ERROR
-	};
+	}
 
 	// The type of an object stored in a slot.
 	//
 	// This is not necessarily the object's *class*, but instead its low level
 	// representation type.
-	[CRepr]
-	public enum WrenType
+	public enum WrenType : c_int
 	{
 		WREN_TYPE_BOOL,
 		WREN_TYPE_NUM,
@@ -307,7 +304,7 @@ public static class wren
 	// Get the current wren version number.
 	//
 	// Can be used to range checks over versions.
-	[CLink] public static extern int wrenGetVersionNumber();
+	[CLink] public static extern c_int wrenGetVersionNumber();
 
 	// Initializes [configuration] with all of its default values.
 	//
@@ -395,7 +392,7 @@ public static class wren
 	// return, you get a very fast FFI.
 	
 	// Returns the number of slots available to the current foreign method.
-	[CLink] public static extern int wrenGetSlotCount(WrenVM* vm);
+	[CLink] public static extern c_int wrenGetSlotCount(WrenVM* vm);
 
 	// Ensures that the foreign method stack has at least [numSlots] available for
 	// use, growing the stack if needed.
@@ -403,15 +400,15 @@ public static class wren
 	// Does not shrink the stack if it has more than enough slots.
 	//
 	// It is an error to call this from a finalizer.
-	[CLink] public static extern void wrenEnsureSlots(WrenVM* vm, int numSlots);
+	[CLink] public static extern void wrenEnsureSlots(WrenVM* vm, c_int numSlots);
 
 	// Gets the type of the object in [slot].
-	[CLink] public static extern WrenType wrenGetSlotType(WrenVM* vm, int slot);
+	[CLink] public static extern WrenType wrenGetSlotType(WrenVM* vm, c_int slot);
 
 	// Reads a boolean value from [slot].
 	//
 	// It is an error to call this if the slot does not contain a boolean value.
-	[CLink] public static extern bool wrenGetSlotBool(WrenVM* vm, int slot);
+	[CLink] public static extern bool wrenGetSlotBool(WrenVM* vm, c_int slot);
 
 	// Reads a byte array from [slot].
 	//
@@ -423,19 +420,19 @@ public static class wren
 	// number of bytes in the array.
 	//
 	// It is an error to call this if the slot does not contain a string.
-	[CLink] public static extern char* wrenGetSlotBytes(WrenVM* vm, int slot, int* length);
+	[CLink] public static extern char* wrenGetSlotBytes(WrenVM* vm, c_int slot, c_int* length);
 
 	// Reads a number from [slot].
 	//
 	// It is an error to call this if the slot does not contain a number.
-	[CLink] public static extern double wrenGetSlotDouble(WrenVM* vm, int slot);
+	[CLink] public static extern double wrenGetSlotDouble(WrenVM* vm, c_int slot);
 
 	// Reads a foreign object from [slot] and returns a pointer to the foreign data
 	// stored with it.
 	//
 	// It is an error to call this if the slot does not contain an instance of a
 	// foreign class.
-	[CLink] public static extern void* wrenGetSlotForeign(WrenVM* vm, int slot);
+	[CLink] public static extern void* wrenGetSlotForeign(WrenVM* vm, c_int slot);
 
 	// Reads a string from [slot].
 	//
@@ -444,25 +441,25 @@ public static class wren
 	// function returns, since the garbage collector may reclaim it.
 	//
 	// It is an error to call this if the slot does not contain a string.
-	[CLink] public static extern char* wrenGetSlotString(WrenVM* vm, int slot);
+	[CLink] public static extern char* wrenGetSlotString(WrenVM* vm, c_int slot);
 
 	// Creates a handle for the value stored in [slot].
 	//
 	// This will prevent the object that is referred to from being garbage collected
 	// until the handle is released by calling [wrenReleaseHandle()].
-	[CLink] public static extern WrenHandle* wrenGetSlotHandle(WrenVM* vm, int slot);
+	[CLink] public static extern WrenHandle* wrenGetSlotHandle(WrenVM* vm, c_int slot);
 
 	// Stores the boolean [value] in [slot].
-	[CLink] public static extern void wrenSetSlotBool(WrenVM* vm, int slot, bool value);
+	[CLink] public static extern void wrenSetSlotBool(WrenVM* vm, c_int slot, bool value);
 
 	// Stores the array [length] of [bytes] in [slot].
 	//
 	// The bytes are copied to a new string within Wren's heap, so you can free
 	// memory used by them after this is called.
-	[CLink] public static extern void wrenSetSlotBytes(WrenVM* vm, int slot, char* bytes, size_t length);
+	[CLink] public static extern void wrenSetSlotBytes(WrenVM* vm, c_int slot, char* bytes, size_t length);
 
 	// Stores the numeric [value] in [slot].
-	[CLink] public static extern void wrenSetSlotDouble(WrenVM* vm, int slot, double value);
+	[CLink] public static extern void wrenSetSlotDouble(WrenVM* vm, c_int slot, double value);
 
 	// Creates a new instance of the foreign class stored in [classSlot] with [size]
 	// bytes of raw storage and places the resulting object in [slot].
@@ -473,16 +470,16 @@ public static class wren
 	// and then the constructor will be invoked when the allocator returns.
 	//
 	// Returns a pointer to the foreign object's data.
-	[CLink] public static extern void* wrenSetSlotNewForeign(WrenVM* vm, int slot, int classSlot, size_t size);
+	[CLink] public static extern void* wrenSetSlotNewForeign(WrenVM* vm, c_int slot, c_int classSlot, size_t size);
 
 	// Stores a new empty list in [slot].
-	[CLink] public static extern void wrenSetSlotNewList(WrenVM* vm, int slot);
+	[CLink] public static extern void wrenSetSlotNewList(WrenVM* vm, c_int slot);
 
 	// Stores a new empty map in [slot].
-	[CLink] public static extern void wrenSetSlotNewMap(WrenVM* vm, int slot);
+	[CLink] public static extern void wrenSetSlotNewMap(WrenVM* vm, c_int slot);
 
 	// Stores null in [slot].
-	[CLink] public static extern void wrenSetSlotNull(WrenVM* vm, int slot);
+	[CLink] public static extern void wrenSetSlotNull(WrenVM* vm, c_int slot);
 
 	// Stores the string [text] in [slot].
 	//
@@ -490,53 +487,53 @@ public static class wren
 	// memory used by it after this is called. The length is calculated using
 	// [strlen()]. If the string may contain any null bytes in the middle, then you
 	// should use [wrenSetSlotBytes()] instead.
-	[CLink] public static extern void wrenSetSlotString(WrenVM* vm, int slot, char* text);
+	[CLink] public static extern void wrenSetSlotString(WrenVM* vm, c_int slot, char* text);
 
 	// Stores the value captured in [handle] in [slot].
 	//
 	// This does not release the handle for the value.
-	[CLink] public static extern void wrenSetSlotHandle(WrenVM* vm, int slot, WrenHandle* handle);
+	[CLink] public static extern void wrenSetSlotHandle(WrenVM* vm, c_int slot, WrenHandle* handle);
 
 	// Returns the number of elements in the list stored in [slot].
-	[CLink] public static extern int wrenGetListCount(WrenVM* vm, int slot);
+	[CLink] public static extern c_int wrenGetListCount(WrenVM* vm, c_int slot);
 
 	// Reads element [index] from the list in [listSlot] and stores it in
 	// [elementSlot].
-	[CLink] public static extern void wrenGetListElement(WrenVM* vm, int listSlot, int index, int elementSlot);
+	[CLink] public static extern void wrenGetListElement(WrenVM* vm, c_int listSlot, c_int index, c_int elementSlot);
 
 	// Sets the value stored at [index] in the list at [listSlot], 
 	// to the value from [elementSlot].
-	[CLink] public static extern void wrenSetListElement(WrenVM* vm, int listSlot, int index, int elementSlot);
+	[CLink] public static extern void wrenSetListElement(WrenVM* vm, c_int listSlot, c_int index, c_int elementSlot);
 
 	// Takes the value stored at [elementSlot] and inserts it into the list stored
 	// at [listSlot] at [index].
 	//
 	// As in Wren, negative indexes can be used to insert from the end. To append
 	// an element, use `-1` for the index.
-	[CLink] public static extern void wrenInsertInList(WrenVM* vm, int listSlot, int index, int elementSlot);
+	[CLink] public static extern void wrenInsertInList(WrenVM* vm, c_int listSlot, c_int index, c_int elementSlot);
 
 	// Returns the number of entries in the map stored in [slot].
-	[CLink] public static extern int wrenGetMapCount(WrenVM* vm, int slot);
+	[CLink] public static extern c_int wrenGetMapCount(WrenVM* vm, c_int slot);
 
 	// Returns true if the key in [keySlot] is found in the map placed in [mapSlot].
-	[CLink] public static extern bool wrenGetMapContainsKey(WrenVM* vm, int mapSlot, int keySlot);
+	[CLink] public static extern bool wrenGetMapContainsKey(WrenVM* vm, c_int mapSlot, c_int keySlot);
 
 	// Retrieves a value with the key in [keySlot] from the map in [mapSlot] and
 	// stores it in [valueSlot].
-	[CLink] public static extern void wrenGetMapValue(WrenVM* vm, int mapSlot, int keySlot, int valueSlot);
+	[CLink] public static extern void wrenGetMapValue(WrenVM* vm, c_int mapSlot, c_int keySlot, c_int valueSlot);
 
 	// Takes the value stored at [valueSlot] and inserts it into the map stored
 	// at [mapSlot] with key [keySlot].
-	[CLink] public static extern void wrenSetMapValue(WrenVM* vm, int mapSlot, int keySlot, int valueSlot);
+	[CLink] public static extern void wrenSetMapValue(WrenVM* vm, c_int mapSlot, c_int keySlot, c_int valueSlot);
 
 	// Removes a value from the map in [mapSlot], with the key from [keySlot],
 	// and place it in [removedValueSlot]. If not found, [removedValueSlot] is
 	// set to null, the same behaviour as the Wren Map API.
-	[CLink] public static extern void wrenRemoveMapValue(WrenVM* vm, int mapSlot, int keySlot, int removedValueSlot);
+	[CLink] public static extern void wrenRemoveMapValue(WrenVM* vm, c_int mapSlot, c_int keySlot, c_int removedValueSlot);
 
 	// Looks up the top level variable with [name] in resolved [module] and stores
 	// it in [slot].
-	[CLink] public static extern void wrenGetVariable(WrenVM* vm, char* module, char* name, int slot);
+	[CLink] public static extern void wrenGetVariable(WrenVM* vm, char* module, char* name, c_int slot);
 
 	// Looks up the top level variable with [name] in resolved [module], 
 	// returns false if not found. The module must be imported at the time, 
@@ -548,7 +545,7 @@ public static class wren
 
 	// Sets the current fiber to be aborted, and uses the value in [slot] as the
 	// runtime error object.
-	[CLink] public static extern void wrenAbortFiber(WrenVM* vm, int slot);
+	[CLink] public static extern void wrenAbortFiber(WrenVM* vm, c_int slot);
 
 	// Returns the user data associated with the WrenVM.
 	[CLink] public static extern void* wrenGetUserData(WrenVM* vm);
